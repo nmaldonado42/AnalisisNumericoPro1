@@ -1,0 +1,408 @@
+\documentclass[answers]{exam}
+\usepackage{amsmath}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage[spanish]{babel}
+
+\vqword{Ejercicio}
+\vpword{Puntos}
+\vsword{Nota}
+
+\renewcommand{\solutiontitle}{\noindent\textbf{\textit{Sol:}}\enspace}
+
+\newcommand{\adj}[4]{#1\negmedspace: #2\rightleftarrows #3:\negmedspace #4}
+
+\header{Nicolas Maldonado Baracaldo}{Análisis Numérico}{Proyecto 1}
+
+\footer{}{\thepage}{}
+
+\addpoints
+
+\begin{document}
+
+\begin{questions}
+
+\question Parte 1, 2, 3, 4 Overleaf, 5 en Google Colab.
+\begin{enumerate}
+\item Para un modelo determin\'istico SIR en una poblaci\'n homog\'enea sin din\'amica vital (no hay nacimientos ni muertes)
+
+\begin{align}
+     \dfrac{dS}{dt}=&-\beta IS  \label{susceptible}\\
+     \dfrac{dI}{dt}=&\beta IS -\gamma I \label{Infected}\\
+     \dfrac{dR}{dt}=&\gamma I \label{Recuperated}
+\end{align}
+
+\begin{enumerate}
+\item  Determinar la relaci\'on que debe cumplir el n\'umero final de infectados. (Final Size en la literatura usual)
+
+\begin{solution}
+Como no consideramos dinámica vital tenemos que $S + I + R = 1$ idénticamente, de manera que
+
+\begin{align*}
+    (S + I + R)' = 0.
+\end{align*}
+
+Por otra parte podemos considerar la primera derivada del logaritmo de $S$ la cual nos dará la relación $(\log{S})' = \frac{1}{S}S' = -\beta I$ y con ella podremos escribir $R'$ en términos de $S$ y $S'$ como
+
+\begin{align*}
+    R' = -\frac{\gamma}{\beta}(\log{S})',
+\end{align*}
+
+y así
+
+\begin{align*}
+    \left(S + I - \frac{\gamma}{\beta}\log{S}\right)' = 0
+\end{align*}
+
+y tenemos la cantidad conservada
+
+\begin{align*}
+    S + I - \frac{\gamma}{\beta}\log{S}.
+\end{align*}
+
+En particular cuando $t \to \infty$ tendremos que $I \to 0$ y $S \to S_\infty$, con lo cual vemos (con condiciones iniciales $S(0) = S_0, I(0) = I_0$) que
+
+\begin{align*}
+    S_\infty - \frac{\gamma}{\beta}\log{S_\infty} &= S_0 + I_0 - \frac{\gamma}{\beta}\log{S_0}\\
+    \log{\frac{S_\infty}{S_0}} &= \frac{\beta}{\gamma}(S_\infty - S_0 - I_0),
+\end{align*}
+
+y definiendo el número básico de reproducción $R_0 = \frac{\beta}{\gamma}S_0$ tenemos
+
+\begin{align*}
+    \log{\frac{S_\infty}{S_0}} &= R_0\left(\frac{S_\infty}{S_0} - 1 - \frac{I_0}{S_0}\right).
+\end{align*}
+
+Finalmente considerando que en $t = 0$ tenemos $R(0) = 0$, y que en $t \to \infty$ tenemos $I \to 0$ escribimos
+
+\begin{align*}
+    \log{\frac{1 - R_\infty}{S_0}} &= -\frac{R_0}{S_0}R_\infty\\
+    1 - R_\infty &= \frac{\gamma}{\beta}R_0e^{-\frac{R_0}{S_0}R_\infty}\\
+    \frac{R_0}{S_0}(1 - R_\infty) &= R_0e^{-\frac{R_0}{S_0}R_\infty}\\
+    -R_0e^{-\frac{R_0}{S_0}} &= -\frac{R_0}{S_0}(1 - R_\infty)e^{-\frac{R_0}{S_0}(1 - R_\infty)}
+\end{align*}
+\end{solution}
+
+\item Determinar las condiciones en $\beta,\gamma$ y los susceptibles en tiempo cero para que el n\'umero de infectados decrezca siempre, o inicialmente crezca para luego decrecer. En términos matemáticos queremos que la solución libre de infectados (Disease Free Equilibrium) sea estable. (El famoso $R_0$ pero realmente teniendo en cuenta  los susceptibles en tiempo $0$)
+
+\begin{solution}
+Podemos escribir el modelo en forma matricial como
+
+\begin{align*}
+    \frac{d}{dt}\begin{pmatrix}
+                    S\\
+                    I\\
+                    R
+                \end{pmatrix} = \begin{pmatrix}
+                    -\beta I & -\beta S & 0\\
+                    \beta I & \beta S - \gamma & 0\\
+                    0 & \gamma & 0
+                \end{pmatrix}\begin{pmatrix}
+                    S\\
+                    I\\
+                    R
+                \end{pmatrix},
+\end{align*}
+
+y en particular para la solución libre de infectados la matriz es
+
+\begin{align*}
+    \begin{pmatrix}
+                    0 & -\beta S_0 & 0\\
+                    0 & \beta S_0 - \gamma & 0\\
+                    0 & \gamma & 0
+                \end{pmatrix},
+\end{align*}
+
+y sabemos que ésta es estable si todos los eigenvalues de esta matriz son negativos. En particular el eigenvalue de interés es $\beta S_0 - \gamma$, el cual será negativo siempre que tengamos
+
+\begin{align*}
+    R_0 = \frac{\beta}{\gamma}S_0 < 1.
+\end{align*}
+\end{solution}
+
+\item Para las condiciones encontradas anteriormente en las que el n\'umero de infectados inicialmente crece para luego decrecer. Determinar el n\'umero m\'aximo de infectados. 
+
+\begin{solution}
+Cuando el número de infectados es máximo (llámese $I^*$) tenemos que $I' = 0$, de donde obtenemos la relación $I^*(\beta S^* - \gamma) = 0$, claramente $I^* \neq 0$ y entonces
+
+\begin{align*}
+    S^* &= \frac{\gamma}{\beta}\\
+    &= \frac{S_0}{R_0}.
+\end{align*}
+
+Por otra parte recordando la relación obtenida anteriormente para escribir $R$ en términos de $S$ tenemos
+
+\begin{align*}
+    R^* &= -\frac{\gamma}{\beta}\log{S^*}\\
+    &= -\frac{S_0}{R_0}\log{\frac{S_0}{R_0}}.
+\end{align*}
+
+Finalmente la cantidad conservada básica, dado que no consideramos dinámica vital, no es más que $S + I + R = 1$ y así
+
+\begin{align*}
+    I^* &= 1 - S^* - R^*\\
+    &= 1 - \frac{S_0}{R_0} + -\frac{S_0}{R_0}\log{\frac{S_0}{R_0}}\\
+    &= 1 - \frac{S_0}{R_0}(1 - \log{\frac{S_0}{R_0}})
+\end{align*}
+\end{solution}
+
+\item Para las condiciones encontradas anteriormente en las que el n\'umero de infectados inicialmente crece para luego decrecer. Determinar el tiempo en el que se alcanza el n\'umero m\'aximo de infectados. (La respuesta es una integral definida que no se puede expresar en t\'erminos de funciones elementales)
+
+\begin{solution}
+Para empezar es útil escribir $I$ en función de $S$, para ello dividimos las ecuaciones diferenciales originales y esto lo podemos integrar para obtener
+
+\begin{align*}
+    I(S) = -S + \frac{\gamma}{\beta}\log{S} + C
+\end{align*}
+
+para alguna constante de integración $C$, la cual puede obtenerse fácilmente considerando las condiciones iniciales $I_0 = 1 - S_0$, tenemos entonces
+
+\begin{align*}
+    I(S) = 1 - S + \frac{S_0}{R_0}\log{\frac{S}{S_0}}.
+\end{align*}
+
+Luego de esto podemos escribir la primera ecuación diferencial completamente en términos de $S$,
+
+\begin{align*}
+    \frac{dS}{dt} = -\beta\left(1 - S + \frac{S_0}{R_0}\log{\frac{S}{S_0}}\right)S,
+\end{align*}
+
+y esto podemos separarlo e integrar $dt$ entre $0$ y $t^*$ y $dS$ entre $S_0$ y $S^*$ para obtener
+
+\begin{align*}
+    t^* = -\frac{1}{\beta}\int_{S_0}^{\frac{S_0}{R_0}} \frac{dS}{\frac{S_0}{R_0}S\log{\frac{S}{S_0}} + S - S^2}.
+\end{align*}
+\end{solution}
+
+\item Dado un valor de poblaci\'on susceptible (o recuperada si quieren), determinar el tiempo que se requiere para llegar a ese valor. (Al igual que el ejercicio anterior, la respuesta es una integral definida que no se puede expresar en t\'erminos de funciones elementales)
+
+\begin{solution}
+De manera análoga a como se obtuvo el tiempo $t^*$, se puede obtener el tiempo que se tarda en llegar a una población suceptible dada, digamos $\hat{S}$, considerando la integral
+
+\begin{align*}
+    \hat{t}(\hat{S}) = -\frac{1}{\beta}\int_{S_0}^{\hat{S}} \frac{dS}{\frac{S_0}{R_0}S\log{\frac{S}{S_0}} + S - S^2}.
+\end{align*}
+\end{solution}
+
+\end{enumerate}
+
+\item Bajo qu\'e condiciones la iteraci\'on de punto fijo de la relaci\'on encontrada en la parte anterior converge a un u\'nico punto fijo? Siempre? que orden de convergencia se obtiene para esas condiciones?
+
+\begin{solution}
+Dada la relación
+
+\begin{align*}
+    \hat{t}(\hat{S}) = -\frac{1}{\beta}\int_{S_0}^{\hat{S}} \frac{dS}{\frac{S_0}{R_0}S\log{\frac{S}{S_0}} + S - S^2},
+\end{align*}
+
+tenemos que una iteración de punto fijo convergerá a un único punto fijo siempre que exista $0 < k < 1$ tal que $|\hat{t}'(\hat{S})| \leq k$ para todo $\hat{S} \in (0,1)$.
+
+Tomamos entonces la derivada
+
+\begin{align*}
+    \hat{t}'(\hat{S}) = -\frac{1}{\beta} \frac{1}{\frac{S_0}{R_0}\hat{S}\log{\frac{\hat{S}}{S_0}} + \hat{S} - \hat{S}^2},
+\end{align*}
+
+y vemos que la convergencia se dará para
+
+\begin{align*}
+    R_0 < \frac{\beta S_0\hat{S}\log{\frac{\hat{S}}{S_0}}}{\beta\hat{S}^2 - \beta\hat{S} + 1},
+\end{align*}
+
+con orden de convergencia 1.
+\end{solution}
+
+\item Considere el m\'etodo de Newton para encontrar el número final de infectados, qu\'e condiciones se deben cumplir para aplicar el m\'etodo de Newton?, qu\'e orden de convergencia se obtiene?
+
+\begin{solution}
+Para hallar el número final de infectados consideramos la función
+
+\begin{align*}
+    f(R) = R_0e^{-\frac{R_0}{S_0}} - \frac{R_0}{S_0}(1 - R)e^{-\frac{R_0}{S_0}(1 - R)},
+\end{align*}
+
+la cual tendrá su raíz en $R_\infty$, i.e., $f(R_\infty) = 0$. Ahora para poder aplicar el método de Newton-Raphson basta con verificar que $f'(R_\infty) \neq 0$ para saber que existe $\delta > 0$ tal que este método genere una secuencia que converja a $R_\infty$ para una aproximación inicial $\in (R_\infty - \delta, R_\infty + \delta)$. Vemos entonces que esto se cumple para
+
+\begin{align*}
+    R_\infty \neq 1 - \frac{S_0}{R_0},
+\end{align*}
+
+en cuyo caso el método tendrá orden de convergencia 2.
+\end{solution}
+
+\item Encuentre por lo menos tres aproximaciones al n\'umero final de infectados y discuta su validez. (Una es la que se obtiene con la funci\'on de Lambert, otra puede ser aproximando la exponencial...)
+
+\begin{solution}
+Recordando la relación obtenida para el final size
+
+\begin{align*}
+    -R_0e^{-\frac{R_0}{S_0}} &= -\frac{R_0}{S_0}(1 - R_\infty)e^{-\frac{R_0}{S_0}(1 - R_\infty)},
+\end{align*}
+
+vemos que ésta es de la forma $z = we^w$, la cual tiene solución dada por la función $W$ de Lambert $w = W(z)$, es decir en este caso tenemos
+
+\begin{align*}
+    -\frac{R_0}{S_0}(1 - R_\infty) = W(-R_0e^{-\frac{R_0}{S_0}}),
+\end{align*}
+
+y así
+
+\begin{align*}
+    R_\infty = 1 + \frac{S_0}{R_0}W(-R_0e^{-\frac{R_0}{S_0}}).
+\end{align*}
+
+Por otra parte, para $|z| \ll 1$ (y en efecto este es el caso para $R_0$ suficientemente grande gracias al comportamiento exponencial) tenemos que la función $W$ de Lambert puede aproximarse como $W(z) \approx z$ y en este caso tendríamos
+
+\begin{align*}
+    R_\infty = 1 - S_0e^{-\frac{R_0}{S_0}}.
+\end{align*}
+
+Por último, para $R_0$ suficientemente grande tenemos que $R_\infty \to 1$ y $-\frac{R_0}{S_0}(1 - R_\infty) \to 0$, de manera que podremos aproximar la exponencial del lado derecho de la relación por $e^{-\frac{R_0}{S_0}(1 - R_\infty)} \approx 1 - \frac{R_0}{S_0}(1 - R_\infty)$, con lo cual tenemos
+
+\begin{align*}
+    R_\infty = 1 - \frac{S_0}{R_0}\left(\tfrac{1}{2} - \sqrt{\tfrac{1}{4} - 
+    R_0e^{-\frac{R_0}{S_0}}}\right).
+\end{align*}
+\end{solution}
+
+\item Considere el n\'umero final de infectados y las aproximaciones encontradas anteriormente como funci\'on de $R_0$ y grafíquelas. (No tiene que programar desde cero el m\'etodo n\'umerico, solo debe comentar en su codigo la libreria, la funci\'on y el m\'etodo que está usando).
+
+\begin{solution}
+En Notebook.
+\end{solution}
+
+\end{enumerate}
+
+\question Parte 1,2,3 Overleaf, 5,6 en Google Colab.
+Para un modelo determin\'istico Multi-SIR en un conjunto de poblaciones todas del mismo tama\~no  sin din\'amica vital (no hay nacimientos ni muertes)
+
+\begin{enumerate}
+\item  Determinar la relaci\'on que debe cumplir el n\'umero final de infectados. (Esta es una relaci\'on del n\'umero de recuperados en un grupo en t\'erminos de los recuperados en los otros grupos)
+
+\begin{solution}
+De manera análoga al caso anterior, consideramos ahora un sistema
+
+\begin{align*}
+     \dfrac{d\mathbf{S}}{dt}=&-\beta \operatorname{diag}(\mathbf{S})A\mathbf{I},\\
+     \dfrac{d\mathbf{I}}{dt}=&\beta \operatorname{diag}(\mathbf{I})A\mathbf{S} -\gamma \mathbf{I},\\
+     \dfrac{d\mathbf{R}}{dt}=&\gamma \mathbf{I},
+\end{align*}
+
+donde ahora tratamos con \emph{vectores} de números de susceptibles, infectados, y muertos, y modelamos las $N$ poblaciones por un grafo no dirigido sin loops con matriz de adyacencia $A$ (en esta primera aproximación asumimos por simplicidad que los parámetros de infección y recuperación, $\beta$ y $\gamma$, son los mismos para todas las poblaciones y es por esto que pueden representarte sencillamente como escalares). Para una población $k$ dada tenemos entonces
+
+\begin{align*}
+    \dfrac{dS_k}{dt}=&-\beta S_k\sum_lA_{kl}I_l,\\
+    \dfrac{dI_k}{dt}=&\beta I_k\sum_lA_{kl}S_l -\gamma I_k,\\
+    \dfrac{dR_k}{dt}=&\gamma I_k,
+\end{align*}
+
+con lo cual podemos hallar una relación similar a la que teníamos en el caso con una sola población, i.e.,
+
+\begin{align*}
+    \sum_lA_{kl}R_l' = -\frac{\gamma}{\beta}(\log{S_k})',
+\end{align*}
+
+y así tener las $N$ cantidades conservadas
+
+\begin{align*}
+    \sum_lA_{kl}(S_l + I_l -\frac{\gamma}{\beta}\log{S_l}).
+\end{align*}
+
+Nuevamente de manera análoga al caso con una sola población consideramos condiciones iniciales $S_k(0) = S_k^0, I_k(0) = I_k^0, R_k(0) = 0, \ \forall k$ y el límite cuando $t \to \infty$ con $S_k \to S_k^\infty, I_k \to 0, R_k \to R_k^\infty$ con esta cantidad conservada y definimos el número básico de reproducción $R_0 = \tfrac{\beta}{\gamma}$ para escribir (se obvian aquí algunos detalles pues es tal y como se mostró para el caso con una población)
+
+\begin{align*}
+    \sum_lA_{kl}(S_l^\infty -\frac{\gamma}{\beta}\log{S_l^\infty}) &= \sum_lA_{kl}(S_l^0 + I_l^0 -\frac{\gamma}{\beta}\log{S_l^0})\\
+    \sum_lA_{kl}\log{\frac{1 - R_l^\infty}{S_l^0}} &= -R_0\sum_lA_{kl}R_l^\infty\\
+    \prod_l\left(\frac{1 - R_l^\infty}{S_l^0}\right)^{A_{kl}} &= e^{-R_0\sum_lA_{kl}R_l^\infty}\\
+    R_k^\infty &= 1 - S_k^0e^{-R_0\sum_lA_{kl}R_l^\infty}
+\end{align*}
+\end{solution}
+
+\item Puede determinar condiciones en las condiciones iniciales y los par\'ametros, para que el n\'umero de infectados decrezca siempre?
+
+\begin{solution}
+Para que el número de infectados decrezca siempre buscamos que $I_k' < 0, \ \forall k$, es decir que debemos exigir
+
+\begin{align*}
+    \left(\beta\sum_lA_{kl}S_l - \gamma\right)I_k < 0, \qquad \forall k
+\end{align*}
+
+y como $I_k > 0, \ \forall k$ esto se reduce a
+
+\begin{align*}
+    \beta\sum_lA_{kl}S_l - \gamma &< 0, \qquad \forall k\\
+    \beta\sum_lA_{kl}S_l &< \gamma, \qquad \forall k\\
+    \frac{\beta}{\gamma}\sum_lA_{kl}S_l &< 1, \qquad \forall k
+\end{align*}
+
+lo cual en particular debe cumplirse en $t = 0$,
+
+\begin{align*}
+    R_0\sum_lA_{kl}S_l^0 &< 1, \qquad \forall k
+\end{align*}
+\end{solution}
+
+\item Puede determinar condiciones bajo las cuales el método de interaci\'on de punto fijo y el m\'etodo de Newton convergen?
+
+\begin{solution}
+Para verificar que estos métodos convergen para hallar el final size de la población $k$ consideramos la función
+
+\begin{align*}
+    f(R_k) = 1 - S_k^0e^{-R_0\sum_lA_{kl}R_l^\infty} - R_k,
+\end{align*}
+
+la cual tendrá su raíz en $R_k^\infty$.
+
+Ahora, la convergencia de la iteración de punto fijo se tendrá siempre que exista $0 < m < 1$ tal que $|f'(R_k)| \leq m$ para todo $R_k \in (0,1)$, es decir que se dará para
+
+\begin{align*}
+    \log{S_k^0} < R_0\sum_lA_{kl}R_l^\infty,
+\end{align*}
+
+y como $S_k^0 \in (0,1)$ y $R_0\sum_lA_{kl}R_l^\infty > 0$ esto se cumple siempre.
+
+En cuanto al método de Newton-Raphson, éste convergerá siempre que $f'(R_k^\infty) \neq 0$, es decir que será para
+
+\begin{align*}
+    S_k^0e^{-R_0\sum_lA_{kl}R_l^\infty} \neq 0,
+\end{align*}
+
+y como $e^{-R_0\sum_lA_{kl}R_l^\infty} \neq 0$ solo tenemos como condición $S_k^0 \neq 0$.
+\end{solution}
+
+\item Encuentre por lo menos dos aproximaciones al n\'umero final de infectados en cada grupo y discuta su validez. ( Puede ser aproximando la exponencial..., la idea es aproximar el n\'umero total de recuperados, si se les ocurre alguna idea super!!!, a mi solo se me ocurre aproximar cada termino antes de sumar)
+
+\begin{solution}
+La aproximación más básica es considerar un mismo $S^0$ para todas las poblaciones (recordemos que ya tenemos como simplificación $R_0$ igual para todas las poblaciones) de manera que el sistema sea más sencillo de resolver, dependiendo éste ahora solamente de los final sizes y de la matriz de adyacencia,
+
+\begin{align*}
+    R_k^\infty &= 1 - S^0e^{-R_0\sum_lA_{kl}R_l^\infty}.
+\end{align*}
+
+Otra posible aproximación al final size de la población $k$ sería, además del uso de un único $S^0$, aproximando la exponencial por $e^x \approx 1 + x$ de manera que tengamos
+
+\begin{align*}
+    R_k^\infty = 1 - S^0 + S^0R_0\sum_lA_{kl}R_l^\infty,
+\end{align*}
+
+sin embargo hay que tener cuidado con esta aproximación pues únicamente es válida para $|x| \ll 1$, lo cual es posible que no se cumpla con la sumatoria que tenemos como argumento en este caso---en efecto, al intentar incorporar esta aproximación en el Notebook para graficarla y comparar con la anterior arrojaba final sizes negativos excepto para $R_0$ muy bajos.
+\end{solution}
+
+\item Considere grafos aleatorios Erd\"os-R\'enyi, Watts-Strogatz y Barab\'asi-Albert con el mismo n\'umero de nodos y aristas (o valor esperado).  Gr\'afiquelos para varios valores de los par\'ametros. (Ejemplos de m\'odulos de python de grafos que pueden usar: Networkx, Igraph, Networkit, Graph-tools)
+
+\begin{solution}
+En Notebook.
+\end{solution}
+
+\item Considere el n\'umero total de recuperados (la suma de los recuperados en cada grupo) y las correspondientes aproximaciones encontradas anteriormente como funci\'on de $R_0$ y los susceptibles en cada grupo en tiempo cero. Gr\'afiquelos para varios de los grafos aleatorios considerados anteriormente. (No tiene que programar desde cero todo, pero si comentar las funciones y las que esta usando).
+
+\begin{solution}
+En Notebook.
+\end{solution}
+
+\end{enumerate}
+
+\end{questions}
+
+\end{document}
